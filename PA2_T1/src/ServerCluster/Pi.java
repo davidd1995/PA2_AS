@@ -5,31 +5,22 @@
  */
 package ServerCluster;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.List;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 
-/**
- *
- * @author omp Leibniz formula for PI PI=4*(1-1/3+1/5-1/7+1/9-1/11 + ...
- * +((-1)^(n+1))/(2n - 1))
- */
 public class Pi extends Thread {
 
-    private final JTextArea messagesTextArea;
+    private final String request;
     private final Socket socket;
     private PrintWriter out;
     private BufferedReader in;
 
-    public Pi(Socket socket, JTextArea messagesTextArea) {
+    public Pi(Socket socket, String request) {
         this.socket = socket;
-        this.messagesTextArea = messagesTextArea;
+        this.request = request;
     }
 
     @Override
@@ -40,7 +31,7 @@ public class Pi extends Thread {
 
             String request = in.readLine();
             if (request != null) {
-                display(request);
+                //display(request);
                 String[] parts = request.split("\\|");
 
                 int precision = Integer.parseInt(parts[4]);
@@ -49,9 +40,9 @@ public class Pi extends Thread {
                 double pi = compute(precision, delay);
                 String response = "result: |" + parts[1] + "|" + parts[2] + "|02|" + parts[4] + "|" + parts[5] + "|" + pi + "|";
                 out.println(response);
-                display(response);
+                //display(response);
             }
-            // close everything
+
             socket.close();
             out.close();
             in.close();
@@ -59,8 +50,6 @@ public class Pi extends Thread {
         }
     }
 
-    // iterations: num of iterations
-    // delay: delay in seconds to simulate computational time
     public Double compute(double iterations, double delay) {
 
         double pi = 0;
@@ -77,13 +66,12 @@ public class Pi extends Thread {
         return pi * 4;
     }
 
-    private void display(final String message) {
+    /*private void display(final String message) {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 messagesTextArea.setText(messagesTextArea.getText() + message + "\n");
             }
         });
-    }
-
+    }*/
 }

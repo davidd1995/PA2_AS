@@ -1,76 +1,69 @@
 package Client;
 
-import java.awt.EventQueue;
+import MessageTypes.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-/**
- *
- * @author david
- */
 
 public class Client {
-    private String ip;
-    private int cID;
-    private int reqID;
-    private int port;
 
-    public Client(int client, int request) {
-        this.cID = client;
-        this.reqID = request;
+    private int clientid;
+    private String lbip;
+    private int lbport;
+    private Socket lbsocket;
+    private PrintWriter out;
+    private BufferedReader in;
+    private Request messagerequest;
+    private String request;
+    private ClientGUI gui;
+
+    public Client(int clientid) {
+        this.clientid = clientid;
+        gui = new ClientGUI(this);
+        gui.setVisible(true);
     }
 
-    public boolean connectToSocket() {
-        Socket clientSocket = null;
-        PrintWriter out = null;
-        BufferedReader in = null;
-        try {
-            clientSocket = new Socket(ip, port);
-            out = new PrintWriter(clientSocket.getOutputStream(), true); // socket's output stream
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); // socket's input stream
-        } catch (UnknownHostException e) {
-            System.err.println(ip+"não foi encontrado");
-            return false;
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to: " + ip);
-            return false;
-        }
+    public void startClient() throws IOException {
 
-        try {
-            clientSocket.close();
-            out.close();
-            in.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // open a connection with the lb
+        // create a socket
+        lbsocket = new Socket(lbip, lbport);
+        // socket's output stream
+        out = new PrintWriter(lbsocket.getOutputStream(), true);
+        // socket's input stream
+        in = new BufferedReader(new InputStreamReader(lbsocket.getInputStream()));
 
-        System.out.println("Ligou ao Servidor");
-        return true;
-    }
-    public void setIpAddress(String ipAddress) {
-        this.ip = ipAddress;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+        System.out.println("Connection is established with the Server");
+        
+        // send the message to the server
+        messagerequest= new Request(this.clientid,this.request);
+        out.println(messagerequest);
+        gui.displayReqOrAns("Request: "+messagerequest.getRequest());
+        
+        // wait for answer
+        String txt = in.readLine();
+        gui.displayReqOrAns("Answer: "+txt);
+        // print echo
+        System.out.println("Client received echo: " + txt);
+        // empty message -> close connection
+        out.close();
+        in.close();
+        lbsocket.close();
+        System.out.println("Client closed the connection");
+        //System.exit(0);
     }
 
-    public void sendMessage(int precision, int delay, ClientGUI clientGUI) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ClientSocketThread(ip, port, cID, reqID, precision, delay, clientGUI).start();
-                reqID+=1;
-            }
-        });
+    public void setLbip(String lbip) {
+        this.lbip = lbip;
     }
 
+    public void setLbport(int lbport) {
+        this.lbport = lbport;
+    }
 
-
+    public void setRequest(String request) {
+        this.request = request;
+    }
 }
