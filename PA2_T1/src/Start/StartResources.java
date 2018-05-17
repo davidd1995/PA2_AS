@@ -18,7 +18,7 @@ public class StartResources {
         for (int i = 0; i < 3; i++) {
             monit.addClient(new Client(i));
         }*/
-        Client x = new Client(3);
-        Client y = new Client(2);    
+        Server x = new Server(3);
+   
     }
 }

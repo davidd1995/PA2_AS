@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ServerCluster;
 
 import java.io.BufferedReader;
@@ -13,14 +8,12 @@ import java.net.Socket;
 
 public class Pi extends Thread {
 
-    private final String request;
     private final Socket socket;
     private PrintWriter out;
     private BufferedReader in;
 
-    public Pi(Socket socket, String request) {
+    public Pi(Socket socket) {
         this.socket = socket;
-        this.request = request;
     }
 
     @Override

@@ -9,30 +9,35 @@ import java.util.logging.Logger;
 public class LoadBalancer extends Thread {
     
     private static int lbport;
-    private static LoadBalancerGUI gui;
+    private static LoadBalancerAndMonitorGUI gui;
     private static ServerSocket lbsocket;
     private static Socket clientsocket;
+    private Monitor monitor;
 
     public LoadBalancer() {
-        gui = new LoadBalancerGUI(this);
+        monitor = new Monitor();
+        gui = new LoadBalancerAndMonitorGUI(this,monitor);
         gui.setVisible(true);
     }
 
-    public void startLoadBalancer() throws IOException {
+    public void startLbAndMonitor() throws IOException {
+        
         try {
-            LoadBalancer.lbsocket = new ServerSocket(lbport);
+            lbsocket = new ServerSocket(lbport);
         } catch (IOException ex) {
             Logger.getLogger(LoadBalancer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //Start listening to heartbeats
+        monitor.listenHeartBeats();
         //Receive requests from clients and launch one thread for each one
         while (true) {
             clientsocket = lbsocket.accept();
-            RequestHandler req = new RequestHandler(clientsocket, gui);
+            RequestHandler req = new RequestHandler(clientsocket, gui, monitor);
             req.start();
         }
     }
 
     public void setLbport(int lbport) {
-        this.lbport = lbport;
+        LoadBalancer.lbport = lbport;
     }
 }
