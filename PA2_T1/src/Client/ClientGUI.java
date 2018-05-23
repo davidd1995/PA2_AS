@@ -10,8 +10,9 @@ public class ClientGUI extends javax.swing.JFrame {
      * Creates new form ClientGUI
      */
     private Client client;
+
     public ClientGUI(Client client) {
-        this.client=client;
+        this.client = client;
         initComponents();
     }
 
@@ -36,12 +37,12 @@ public class ClientGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTextField1.setText("iplb");
+        jTextField1.setText("localhost");
 
-        jTextField2.setText("portlb");
+        jTextField2.setText("5000");
         jTextField2.setToolTipText("");
 
-        jTextField3.setText("request");
+        jTextField3.setText("1");
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField3ActionPerformed(evt);
@@ -78,7 +79,7 @@ public class ClientGUI extends javax.swing.JFrame {
 
         jLabel6.setText("Delay:");
 
-        jTextField4.setText("jTextField4");
+        jTextField4.setText("2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -150,32 +151,35 @@ public class ClientGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        System.out.println("send request");
+        System.out.println(jTextField3.getText() + " " + jTextField4.getText());
+
+        client.setPrecision(Integer.parseInt(jTextField3.getText()));
+        client.setDelay(Integer.parseInt(jTextField4.getText()));
+        client.sendRequest();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+
+    }//GEN-LAST:event_jTextField3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+
         try {
+            System.out.println("connect");
+            System.out.println(jTextField1.getText() + " " + jTextField2.getText());
             client.setLbip(jTextField1.getText());
             client.setLbport(Integer.parseInt(jTextField2.getText()));
             client.setConnection();
         } catch (IOException ex) {
             Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
-    
-    }//GEN-LAST:event_jTextField3ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        client.setPrecision(Integer.parseInt(jTextField3.getText()));
-        client.setDelay(Integer.parseInt(jTextField4.getText()));
-        try {
-            client.sendRequest();
-        } catch (IOException ex) {
-            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    public void displayReqOrAns(String text){
-        jTextArea1.append(text+"\n");
+    public void displayReqOrAns(String text) {
+        jTextArea1.append(text + "\n");
     }
+
     /**
      * @param args the command line arguments
      */

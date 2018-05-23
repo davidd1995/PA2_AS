@@ -1,5 +1,6 @@
 package Client;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.net.Socket;
 
 public class Client {
 
+    private static int clientidcounter=0;
     private int clientid;
     private int requestid=1;
     private int precision;
@@ -20,10 +22,11 @@ public class Client {
     private BufferedReader in;
     private ClientGUI gui;
 
-    public Client(int clientid) {
-        this.clientid = clientid;
+    public Client() {
+        this.clientid = clientidcounter;
         gui = new ClientGUI(this);
         gui.setVisible(true);
+        System.out.println("CC "+clientidcounter);
     }
     
     public void setConnection() throws IOException {
@@ -34,26 +37,34 @@ public class Client {
         out = new PrintWriter(lbsocket.getOutputStream(), true);
         // socket's input stream
         in = new BufferedReader(new InputStreamReader(lbsocket.getInputStream()));
+                Client.clientidcounter++;
         
-        System.out.println("Connection is established with the Server");
+        System.out.println("Connection is established with the Loadbalancer");
     }
     
-    public void sendRequest() throws IOException {    
+    /*public void sendRequest() throws IOException {    
         // send the request to the server and display on GUI
         request=Integer.toString(clientid)+'|'+Integer.toString(requestid)+'|'+"01|"+Integer.toString(precision)+'|'+Integer.toString(delay);
+        System.out.println("Request to send:"+ request);
         out.println(request);
         display("Request: "+request);
         
         // wait and display response from server
         String response = in.readLine();
+        System.out.println(response);
         display("Response: "+response);
         requestid++;
-
-        //out.close();
-        //in.close();
-        //lbsocket.close();
-        //System.out.println("Client "+clientid+" closed the connection");
-        //System.exit(0);
+    }*/
+    
+    public void sendRequest() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                String request = clientid + "|" + requestid + "|01|" + precision + "|" + delay + "|";
+                new ClientSendMessage(request, out, in, gui).start();
+                requestid++;
+            }
+        });
     }
 
     public void setLbip(String lbip) {
@@ -74,5 +85,14 @@ public class Client {
     
     private void display(String message) {
         gui.displayReqOrAns(message);
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" + "clientid=" + clientid + ", request=" + request + ", lbip=" + lbip + ", lbport=" + lbport + '}';
+    }
+    
+    public static void main(String[] args){
+        Client x = new Client();
     }
 }

@@ -1,5 +1,6 @@
 package ServerCluster;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -144,7 +145,11 @@ public class ServerGUI extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    
+    public void appendEvents(String message) {
+        jTextArea1.append(message+"\n");
+    }
+    
     /**
      * @param args the command line arguments
      */

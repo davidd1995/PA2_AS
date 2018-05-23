@@ -1,6 +1,5 @@
 package LoadBalancer;
 
-import MessageTypes.Request;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RequestHandler extends Thread {
+
     private LoadBalancerAndMonitorGUI lbgui;
     private Monitor monitor;
     private Socket clientlbsocket;
@@ -21,59 +21,83 @@ public class RequestHandler extends Thread {
     private BufferedReader inserver = null;
 
     public RequestHandler(Socket sk, LoadBalancerAndMonitorGUI lbgui, Monitor monitor) {
-        this.lbgui= lbgui;
+        this.lbgui = lbgui;
         this.clientlbsocket = sk;
-        this.monitor=monitor;
+        this.monitor = monitor;
     }
 
     @Override
     public void run() {
         try {
-            outclient = new PrintWriter(clientlbsocket.getOutputStream(), true);
             inclient = new BufferedReader(new InputStreamReader(clientlbsocket.getInputStream()));
-            
-            //read request from client
-            String request = inclient.readLine();
-            
-            // null message?
-            if (request != null) {
-                /*if server load...code for requests allocation*/
-                lbserversocket = new Socket("", 3000);
-                //depois de decidir o servidor, manda o id do servidor no pedido.
-                request.setServerID(32);
-                //manda para a GUI o evento cliente- servidor- pedido
-                display(request.toString());
-                
-                outserver = new PrintWriter(lbserversocket.getOutputStream(), true);
-                inserver = new BufferedReader(new InputStreamReader(lbserversocket.getInputStream()));
-                
-                //send request to specific server
-                outserver.println(request.getRequest());
-                
-                //receive answer from server
-                String response = inserver.readLine();
-                
-                request.setAnswer(response);
-                display(request.toString());
-                //return answer to client
-                outclient.println(request);
+            outclient = new PrintWriter(clientlbsocket.getOutputStream(), true);
+            while(true){
+                //read requests from client
+                //System.out.println("Estou à espera do request");
+                String request = inclient.readLine();
+
+                // null message?
+                if (request != null)
+                    allocateRequest(request);
+                else
+                    break;
             }
             // close everything
             clientlbsocket.close();
             outclient.close();
             inclient.close();
-            outserver.close();
-            inserver.close();
-            lbserversocket.close();
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private void display(final String message) {
+
+    private void allocateRequest(String request) throws IOException {
+                
+        /*Check servers load*/
+        int index = monitor.getIndexOfMostFreeServer();
+
+        if (index != -1) {
+            int serverport = monitor.getServerPort(index);
+            lbserversocket = new Socket("localhost", serverport);
+
+            outserver = new PrintWriter(lbserversocket.getOutputStream(), true);
+            inserver = new BufferedReader(new InputStreamReader(lbserversocket.getInputStream()));
+
+            //depois de decidir o servidor, manda o id do servidor no pedido.
+            //manda para a GUI o evento cliente- servidor- pedido
+            display(request);
+
+            //send request to specific server
+            outserver.println(request);
+
+            //receive answer from server
+            String response;
+            try {
+                response = inserver.readLine();
+                display(response);
+                //return answer to client
+                outclient.println(response);
+            } catch (IOException ex) {
+                Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            outserver.close();
+            inserver.close();
+            lbserversocket.close();
+        } else {
+            
+            display(request);
+            System.out.println("!!!!!!"+request);
+            display("Servers are busy!");
+            outclient.println("Servers are busy!");
+        }
+    }
+
+    private void display(String message) {
+        System.out.println("????"+message);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                System.out.println("????"+message);
                 lbgui.appendEvents(message);
             }
         });

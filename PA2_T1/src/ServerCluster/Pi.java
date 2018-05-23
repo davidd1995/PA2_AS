@@ -1,5 +1,6 @@
 package ServerCluster;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,9 +12,11 @@ public class Pi extends Thread {
     private final Socket socket;
     private PrintWriter out;
     private BufferedReader in;
+    private ServerGUI gui;
 
-    public Pi(Socket socket) {
+    public Pi(Socket socket,ServerGUI gui) {
         this.socket = socket;
+        this.gui=gui;
     }
 
     @Override
@@ -24,16 +27,16 @@ public class Pi extends Thread {
 
             String request = in.readLine();
             if (request != null) {
-                //display(request);
+                display(request);
                 String[] parts = request.split("\\|");
 
                 int precision = Integer.parseInt(parts[4]);
                 int delay = Integer.parseInt(parts[5]);
 
                 double pi = compute(precision, delay);
-                String response = "result: |" + parts[1] + "|" + parts[2] + "|02|" + parts[4] + "|" + parts[5] + "|" + pi + "|";
+                String response = "result: |" + parts[1] + "|" + parts[2] + "|02|" + parts[4] + "|" + parts[5] + "|" + pi ;
                 out.println(response);
-                //display(response);
+                display(response);
             }
 
             socket.close();
@@ -59,12 +62,12 @@ public class Pi extends Thread {
         return pi * 4;
     }
 
-    /*private void display(final String message) {
+    private void display(String message) {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                messagesTextArea.setText(messagesTextArea.getText() + message + "\n");
+                gui.appendEvents(message);
             }
         });
-    }*/
+    }
 }

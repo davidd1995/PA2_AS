@@ -27,17 +27,27 @@ public class LoadBalancer extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(LoadBalancer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //Start listening to heartbeats
+
+        //Start listening connections from servers and heartbeats in a thread
         monitor.listenHeartBeats();
+
         //Receive requests from clients and launch one thread for each one
         while (true) {
+            System.out.println("estou a aguardar connects");
             clientsocket = lbsocket.accept();
+            System.out.println("pedido recebido");
+            System.out.println(clientsocket.getPort());
             RequestHandler req = new RequestHandler(clientsocket, gui, monitor);
             req.start();
+            System.out.println("pedido encaminhado");
+            
         }
     }
 
     public void setLbport(int lbport) {
         LoadBalancer.lbport = lbport;
+    }
+    public static void main(String[] args){
+        LoadBalancer lb = new LoadBalancer();
     }
 }

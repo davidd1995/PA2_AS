@@ -1,41 +1,91 @@
 package LoadBalancer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class HeartBeatReceiverThread extends Thread{
-    private Socket socket;
-    private ServerSocket HBSocket;
-    private int hbport;
+public class HeartBeatReceiverThread extends Thread {
+
+    private Socket hbsocket;
     private BufferedReader in;
-    
-    public HeartBeatReceiverThread(int hbport){
-        this.hbport=hbport;
+    private PrintWriter out;
+    private List<ServerInfo> activeservers;
+    private ReentrantLock rl;
+    private int idserver;
+    private int portserver;
+    private String hostserver="localhost";
+
+    public HeartBeatReceiverThread(Socket hbsocket, List<ServerInfo> activeservers, ReentrantLock rl) {
+        this.hbsocket = hbsocket;
+        //this.idtoserver = idtoserver;
+        this.activeservers = activeservers;
+        this.rl = rl;
     }
-    
+
     @Override
     public void run() {
         try {
-            HBSocket = new ServerSocket(hbport);
-        } catch (IOException ex) {
-            Logger.getLogger(HeartBeatReceiverThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println("HB is listening on port: " + hbport);
-        while (true) {
-            System.out.println("Server is accepting a new connection");
+            // socket´s output stream
+            out = new PrintWriter(hbsocket.getOutputStream(), true);
+            // socket's input stream
+            in = new BufferedReader(new InputStreamReader(hbsocket.getInputStream()));
+            
+            //out.println(idtoserver);
+            idserver = Integer.parseInt(in.readLine());
+            System.out.println(idserver);
+            portserver = Integer.parseInt(in.readLine());
+            int size = Integer.parseInt(in.readLine());
+            //hostserver = hbsocket.getLocalAddress();
+            rl.lock();
             try {
-                // wait for a new connection/client
-                socket = HBSocket.accept();
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                boolean flag = false;
+                for (int i = 0; i < activeservers.size(); i++) {
+                    if (activeservers.get(i).getId() == idserver) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    activeservers.add(new ServerInfo(idserver, portserver, hostserver, size));
+                }
+            } catch (Exception e) {
 
-            } catch (IOException ex) {
-                Logger.getLogger(HeartBeatReceiverThread.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                rl.unlock();
             }
+            while (true) {
+                // wait for a message from the client
+                String text = in.readLine();
+                // null message? server down
+                if (text == null) {
+                    // end of communication with this client
+                    //j.append("Server " + id + " is down!\n");
+                    rl.lock();
+                    try {
+                        int index = -1;
+                        for (int i = 0; i < activeservers.size(); i++) {
+                            if (activeservers.get(i).getId() == idserver) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index != -1) {
+                            activeservers.remove(index);
+                        }
+                    } catch (Exception e) {
+
+                    } finally {
+                        rl.unlock();
+                    }
+                    return;
+                }
+                //j.append("Server " + id + " is " + text + "\n");
+                System.out.println(activeservers.toString());
+            }
+        } catch (Exception e) {
         }
-    } 
+    }
 }

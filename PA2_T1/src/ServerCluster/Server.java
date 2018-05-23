@@ -15,15 +15,15 @@ public class Server {
     private String request;
     private ServerGUI gui;
     
-    public Server(int serverId) {
-        this.serverId = serverId;
+    public Server() {
+        //this.serverId = serverId;
         gui = new ServerGUI(this);
         gui.setVisible(true);
     }
 
     public void startServer() throws IOException {
         //Start sending heartbeats in background
-        HeartBeatSenderThread hbsend = new HeartBeatSenderThread(hbreceiverport, serverId);
+        HeartBeatSenderThread hbsend = new HeartBeatSenderThread(this);
         hbsend.start();
         
         //start listen requests
@@ -35,7 +35,7 @@ public class Server {
             // wait for a new connection/client
             clientSocket = serverSocket.accept();
             // create a new thread to deal with the new client
-            Pi compute = new Pi(clientSocket);
+            Pi compute = new Pi(clientSocket,gui);
             System.out.println("Socket: " + clientSocket.getLocalPort());
             compute.start();
         }
@@ -43,6 +43,10 @@ public class Server {
     
     public int getPortmonitorlistening() {
         return hbreceiverport;
+    }
+
+    public int getQueueSize() {
+        return queueSize;
     }
 
     public void setPortHbReceiver(int hbreceiverport) {
@@ -71,5 +75,9 @@ public class Server {
 
     public String getRequest() {
         return request;
+    }
+    
+    public static void main(String[] args){
+        Server x = new Server();
     }
 }
