@@ -7,21 +7,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoadBalancer extends Thread {
-    
-    private static int lbport;
-    private static LoadBalancerAndMonitorGUI gui;
-    private static ServerSocket lbsocket;
-    private static Socket clientsocket;
+
+    private int lbport;
+    private LoadBalancerAndMonitorGUI gui;
+    private ServerSocket lbsocket;
+    private Socket clientsocket;
     private Monitor monitor;
 
     public LoadBalancer() {
         monitor = new Monitor();
-        gui = new LoadBalancerAndMonitorGUI(this,monitor);
+        gui = new LoadBalancerAndMonitorGUI(this, monitor);
         gui.setVisible(true);
     }
 
     public void startLbAndMonitor() throws IOException {
-        
+
         try {
             lbsocket = new ServerSocket(lbport);
         } catch (IOException ex) {
@@ -32,22 +32,33 @@ public class LoadBalancer extends Thread {
         monitor.listenHeartBeats();
 
         //Receive requests from clients and launch one thread for each one
-        while (true) {
-            System.out.println("estou a aguardar connects");
-            clientsocket = lbsocket.accept();
-            System.out.println("pedido recebido");
-            System.out.println(clientsocket.getPort());
-            RequestHandler req = new RequestHandler(clientsocket, gui, monitor);
-            req.start();
-            System.out.println("pedido encaminhado");
-            
-        }
+        Thread receiverequests = new Thread() {
+            public void run() {
+                while (true) {
+                    System.out.println("estou a aguardar connects");
+                    try {
+                        clientsocket = lbsocket.accept();
+                    } catch (IOException ex) {
+                        Logger.getLogger(LoadBalancer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    System.out.println("pedido recebido");
+                    System.out.println(clientsocket.getPort());
+                    RequestHandler req = new RequestHandler(clientsocket, gui, monitor);
+                    req.start();
+                    System.out.println("pedido encaminhado");
+
+                }
+            }
+        };
+        receiverequests.start();
+
     }
 
     public void setLbport(int lbport) {
-        LoadBalancer.lbport = lbport;
+        this.lbport = lbport;
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         LoadBalancer lb = new LoadBalancer();
     }
 }

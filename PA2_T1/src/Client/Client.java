@@ -1,6 +1,5 @@
 package Client;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +8,7 @@ import java.net.Socket;
 
 public class Client {
 
-    private static int clientidcounter=0;
+    static int clientidcounter;
     private int clientid;
     private int requestid=1;
     private int precision;
@@ -25,11 +24,13 @@ public class Client {
     public Client() {
         this.clientid = clientidcounter;
         gui = new ClientGUI(this);
-        gui.setVisible(true);
-        System.out.println("CC "+clientidcounter);
+        gui.setVisible(true);   
+       
     }
     
     public void setConnection() throws IOException {
+         Client.clientidcounter++;
+        System.out.println("!!!!!!CC :: "+clientid);
         // open a connection with the lb
         // create a socket
         lbsocket = new Socket(lbip, lbport);
@@ -37,12 +38,11 @@ public class Client {
         out = new PrintWriter(lbsocket.getOutputStream(), true);
         // socket's input stream
         in = new BufferedReader(new InputStreamReader(lbsocket.getInputStream()));
-                Client.clientidcounter++;
         
         System.out.println("Connection is established with the Loadbalancer");
     }
     
-    /*public void sendRequest() throws IOException {    
+    public void sendRequest() throws IOException {    
         // send the request to the server and display on GUI
         request=Integer.toString(clientid)+'|'+Integer.toString(requestid)+'|'+"01|"+Integer.toString(precision)+'|'+Integer.toString(delay);
         System.out.println("Request to send:"+ request);
@@ -54,17 +54,6 @@ public class Client {
         System.out.println(response);
         display("Response: "+response);
         requestid++;
-    }*/
-    
-    public void sendRequest() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                String request = clientid + "|" + requestid + "|01|" + precision + "|" + delay + "|";
-                new ClientSendMessage(request, out, in, gui).start();
-                requestid++;
-            }
-        });
     }
 
     public void setLbip(String lbip) {

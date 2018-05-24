@@ -55,7 +55,7 @@ public class RequestHandler extends Thread {
                 
         /*Check servers load*/
         int index = monitor.getIndexOfMostFreeServer();
-
+        System.out.println("indice do servidor free: "+index);
         if (index != -1) {
             int serverport = monitor.getServerPort(index);
             lbserversocket = new Socket("localhost", serverport);
@@ -93,11 +93,9 @@ public class RequestHandler extends Thread {
     }
 
     private void display(String message) {
-        System.out.println("????"+message);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println("????"+message);
                 lbgui.appendEvents(message);
             }
         });

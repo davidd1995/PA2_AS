@@ -3,6 +3,8 @@ package ServerCluster;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server {
 
@@ -25,20 +27,31 @@ public class Server {
         //Start sending heartbeats in background
         HeartBeatSenderThread hbsend = new HeartBeatSenderThread(this);
         hbsend.start();
-        
+
         //start listen requests
         serverSocket = new ServerSocket(portToRequest);
         System.out.println("Server is listening on port: " + portToRequest);
+
+        Thread receiverequests = new Thread() {
+            public void run() {
+                while (true) {
+                    System.out.println("Server is accepting a new connection");
+                    try {
+                        // wait for a new connection/client
+                        clientSocket = serverSocket.accept();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    // create a new thread to deal with the new client
+                    Pi compute = new Pi(clientSocket, gui);
+                    System.out.println("Socket: " + clientSocket.getLocalPort());
+                    compute.start();
+                }
+            }
+
+        };
+        receiverequests.start();
         
-        while (true) {
-            System.out.println("Server is accepting a new connection");
-            // wait for a new connection/client
-            clientSocket = serverSocket.accept();
-            // create a new thread to deal with the new client
-            Pi compute = new Pi(clientSocket,gui);
-            System.out.println("Socket: " + clientSocket.getLocalPort());
-            compute.start();
-        }
     }
     
     public int getPortmonitorlistening() {

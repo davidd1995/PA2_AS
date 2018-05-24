@@ -156,7 +156,11 @@ public class ClientGUI extends javax.swing.JFrame {
 
         client.setPrecision(Integer.parseInt(jTextField3.getText()));
         client.setDelay(Integer.parseInt(jTextField4.getText()));
-        client.sendRequest();
+        try {
+            client.sendRequest();
+        } catch (IOException ex) {
+            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
