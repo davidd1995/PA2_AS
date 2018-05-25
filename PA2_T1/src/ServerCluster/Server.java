@@ -7,7 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
-
+    
+    private static int serveridcounter=0;
     private int serverId;
     private int queueSize;
     private int portToRequest;
@@ -16,11 +17,12 @@ public class Server {
     private Socket clientSocket;
     private String request;
     private ServerGUI gui;
-    
+
     public Server() {
-        //this.serverId = serverId;
+        this.serverId = serveridcounter;
         gui = new ServerGUI(this);
         gui.setVisible(true);
+        serveridcounter++;
     }
 
     public void startServer() throws IOException {
@@ -29,11 +31,14 @@ public class Server {
         hbsend.start();
 
         //start listen requests
-        serverSocket = new ServerSocket(portToRequest);
-        System.out.println("Server is listening on port: " + portToRequest);
-
         Thread receiverequests = new Thread() {
             public void run() {
+                try {
+                    serverSocket = new ServerSocket(portToRequest);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.println("Server is listening on port: " + portToRequest);
                 while (true) {
                     System.out.println("Server is accepting a new connection");
                     try {
@@ -51,9 +56,8 @@ public class Server {
 
         };
         receiverequests.start();
-        
     }
-    
+
     public int getPortmonitorlistening() {
         return hbreceiverport;
     }
@@ -89,8 +93,8 @@ public class Server {
     public String getRequest() {
         return request;
     }
-    
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         Server x = new Server();
     }
 }

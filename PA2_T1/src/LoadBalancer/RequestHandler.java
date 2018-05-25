@@ -57,6 +57,7 @@ public class RequestHandler extends Thread {
         int index = monitor.getIndexOfMostFreeServer();
         System.out.println("indice do servidor free: "+index);
         if (index != -1) {
+            monitor.increaseServerRequest(index);
             int serverport = monitor.getServerPort(index);
             lbserversocket = new Socket("localhost", serverport);
 
@@ -83,12 +84,12 @@ public class RequestHandler extends Thread {
             outserver.close();
             inserver.close();
             lbserversocket.close();
+            monitor.decreaseServerRequest(index);
         } else {
-            
+            String[] parts = request.split("\\|");
             display(request);
-            System.out.println("!!!!!!"+request);
-            display("Servers are busy!");
-            outclient.println("Servers are busy!");
+            display("Result: |"+parts[1]+"|"+parts[2]+"|03|"+parts[4]+"|"+parts[5]);
+            outclient.println("Result: |"+parts[1]+"|"+parts[2]+"|03|"+parts[4]+"|"+parts[5]);
         }
     }
 

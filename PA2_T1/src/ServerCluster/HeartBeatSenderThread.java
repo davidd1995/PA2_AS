@@ -31,9 +31,10 @@ public class HeartBeatSenderThread extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             //jTextArea1.append("Connection is established with the Monitor\n");
             //jButton1.setEnabled(false);
-            int id= Integer.parseInt(in.readLine());
-            server.setServerId(id); 
+            //int id= Integer.parseInt(in.readLine());
+            //server.setServerId(id); 
             //jTextArea1.append("id = " + id + "\n");
+            out.println(server.getServerId());
             out.println(server.getPortToRequest());
             out.println(server.getQueueSize());
         } catch (UnknownHostException e) {

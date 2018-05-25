@@ -29,7 +29,7 @@ public class Client {
     }
     
     public void setConnection() throws IOException {
-         Client.clientidcounter++;
+        Client.clientidcounter++;
         System.out.println("!!!!!!CC :: "+clientid);
         // open a connection with the lb
         // create a socket
@@ -44,15 +44,15 @@ public class Client {
     
     public void sendRequest() throws IOException {    
         // send the request to the server and display on GUI
-        request=Integer.toString(clientid)+'|'+Integer.toString(requestid)+'|'+"01|"+Integer.toString(precision)+'|'+Integer.toString(delay);
+        request="Request: |"+Integer.toString(clientid)+'|'+Integer.toString(requestid)+'|'+"01|"+Integer.toString(precision)+'|'+Integer.toString(delay);
         System.out.println("Request to send:"+ request);
         out.println(request);
-        display("Request: "+request);
+        display(request);
         
         // wait and display response from server
         String response = in.readLine();
         System.out.println(response);
-        display("Response: "+response);
+        display(response);
         requestid++;
     }
 

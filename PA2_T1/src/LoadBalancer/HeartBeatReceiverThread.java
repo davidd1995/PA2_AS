@@ -15,12 +15,12 @@ public class HeartBeatReceiverThread extends Thread {
     private List<ServerInfo> activeservers;
     private ReentrantLock rl;
     private int idserver;
+    private int size;
     private int portserver;
-    private String hostserver="localhost";
+    private String hostserver = "localhost";
 
     public HeartBeatReceiverThread(Socket hbsocket, List<ServerInfo> activeservers, ReentrantLock rl) {
         this.hbsocket = hbsocket;
-        //this.idtoserver = idtoserver;
         this.activeservers = activeservers;
         this.rl = rl;
     }
@@ -32,13 +32,13 @@ public class HeartBeatReceiverThread extends Thread {
             out = new PrintWriter(hbsocket.getOutputStream(), true);
             // socket's input stream
             in = new BufferedReader(new InputStreamReader(hbsocket.getInputStream()));
-            
-            //out.println(idtoserver);
+
             idserver = Integer.parseInt(in.readLine());
-            System.out.println(idserver);
+            System.out.println("Chegou msg com id do servidor " + idserver);
+
             portserver = Integer.parseInt(in.readLine());
-            int size = Integer.parseInt(in.readLine());
-            //hostserver = hbsocket.getLocalAddress();
+            size = Integer.parseInt(in.readLine());
+
             rl.lock();
             try {
                 boolean flag = false;
@@ -50,6 +50,7 @@ public class HeartBeatReceiverThread extends Thread {
                 }
                 if (!flag) {
                     activeservers.add(new ServerInfo(idserver, portserver, hostserver, size));
+                    System.out.println("Servidor ligado do lb" + idserver);
                 }
             } catch (Exception e) {
 
@@ -61,6 +62,7 @@ public class HeartBeatReceiverThread extends Thread {
                 String text = in.readLine();
                 // null message? server down
                 if (text == null) {
+                    System.out.println("Servidor mensagem nula" + idserver);
                     // end of communication with this client
                     //j.append("Server " + id + " is down!\n");
                     rl.lock();

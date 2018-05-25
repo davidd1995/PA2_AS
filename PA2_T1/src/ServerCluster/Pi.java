@@ -26,6 +26,7 @@ public class Pi extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             String request = in.readLine();
+            System.out.println("Request recebido pelo servidor: "+request);
             if (request != null) {
                 display(request);
                 String[] parts = request.split("\\|");

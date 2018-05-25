@@ -31,6 +31,22 @@ public class Monitor {
         return rl;
     }
     
+    public void decreaseServerRequest(int index){
+        for(int i =0;i< activeservers.size();i++){
+            if(activeservers.get(i).getId()==index){
+                activeservers.get(i).decrementRequests();
+            }              
+        }
+    }
+
+    public void increaseServerRequest(int index) {
+        for (int i = 0; i < activeservers.size(); i++) {
+            if (activeservers.get(i).getId() == index) {
+                activeservers.get(i).incrementRequests();
+            }
+        }
+    }
+
     public int getIndexOfMostFreeServer(){
         int index=0;
         double fator=1;
@@ -59,6 +75,7 @@ public class Monitor {
     public void listenHeartBeats() {
         Thread hbThread = new Thread() {
             public void run() {
+                System.out.println("cheguei à função do monitor que lanca a thread HBrec");
                 try {
                     monitorlisteningsocket = new ServerSocket(hbport);
                 } catch (Exception e) {
