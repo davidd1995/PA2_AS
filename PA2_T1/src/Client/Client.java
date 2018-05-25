@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 
-    static int clientidcounter;
+    private static final AtomicInteger clientidcounter = new AtomicInteger(0); 
     private int clientid;
     private int requestid=1;
     private int precision;
@@ -22,14 +23,12 @@ public class Client {
     private ClientGUI gui;
 
     public Client() {
-        this.clientid = clientidcounter;
+        clientid=clientidcounter.incrementAndGet(); 
         gui = new ClientGUI(this);
-        gui.setVisible(true);   
-       
+        gui.setVisible(true);         
     }
     
     public void setConnection() throws IOException {
-        Client.clientidcounter++;
         System.out.println("!!!!!!CC :: "+clientid);
         // open a connection with the lb
         // create a socket

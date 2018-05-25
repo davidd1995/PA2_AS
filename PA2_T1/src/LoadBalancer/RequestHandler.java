@@ -31,16 +31,17 @@ public class RequestHandler extends Thread {
         try {
             inclient = new BufferedReader(new InputStreamReader(clientlbsocket.getInputStream()));
             outclient = new PrintWriter(clientlbsocket.getOutputStream(), true);
-            while(true){
+            while (true) {
                 //read requests from client
                 //System.out.println("Estou à espera do request");
                 String request = inclient.readLine();
 
                 // null message?
-                if (request != null)
+                if (request != null) {
                     allocateRequest(request);
-                else
+                } else {
                     break;
+                }
             }
             // close everything
             clientlbsocket.close();
@@ -52,10 +53,10 @@ public class RequestHandler extends Thread {
     }
 
     private void allocateRequest(String request) throws IOException {
-                
+
         /*Check servers load*/
         int index = monitor.getIndexOfMostFreeServer();
-        System.out.println("indice do servidor free: "+index);
+        System.out.println("indice do servidor free: " + index);
         if (index != -1) {
             monitor.increaseServerRequest(index);
             int serverport = monitor.getServerPort(index);
@@ -75,9 +76,15 @@ public class RequestHandler extends Thread {
             String response;
             try {
                 response = inserver.readLine();
-                display(response);
-                //return answer to client
-                outclient.println(response);
+                //Server is down
+                if (response == null) {
+                    allocateRequest(request);
+                } else {
+                    display(response);
+                    //return answer to client
+                    outclient.println(response);
+                }
+
             } catch (IOException ex) {
                 Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -88,8 +95,8 @@ public class RequestHandler extends Thread {
         } else {
             String[] parts = request.split("\\|");
             display(request);
-            display("Result: |"+parts[1]+"|"+parts[2]+"|03|"+parts[4]+"|"+parts[5]);
-            outclient.println("Result: |"+parts[1]+"|"+parts[2]+"|03|"+parts[4]+"|"+parts[5]);
+            display("Result: |" + parts[1] + "|" + parts[2] + "|03|" + parts[4] + "|" + parts[5]);
+            outclient.println("Result: |" + parts[1] + "|" + parts[2] + "|03|" + parts[4] + "|" + parts[5]);
         }
     }
 
