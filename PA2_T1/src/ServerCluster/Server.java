@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 public class Server {
     
-    private static int serveridcounter=0;
     private int serverId;
     private int queueSize;
     private int portToRequest;
@@ -19,10 +18,8 @@ public class Server {
     private ServerGUI gui;
 
     public Server() {
-        this.serverId = serveridcounter;
         gui = new ServerGUI(this);
         gui.setVisible(true);
-        serveridcounter++;
     }
 
     public void startServer() throws IOException {

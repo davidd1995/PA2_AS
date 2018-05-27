@@ -19,11 +19,13 @@ public class RequestHandler extends Thread {
     private BufferedReader inclient = null;
     private PrintWriter outserver = null;
     private BufferedReader inserver = null;
+    private int clientid;
 
-    public RequestHandler(Socket sk, LoadBalancerAndMonitorGUI lbgui, Monitor monitor) {
+    public RequestHandler(Socket sk, LoadBalancerAndMonitorGUI lbgui, Monitor monitor,int clientid) {
         this.lbgui = lbgui;
         this.clientlbsocket = sk;
         this.monitor = monitor;
+        this.clientid=clientid;
     }
 
     @Override
@@ -31,6 +33,7 @@ public class RequestHandler extends Thread {
         try {
             inclient = new BufferedReader(new InputStreamReader(clientlbsocket.getInputStream()));
             outclient = new PrintWriter(clientlbsocket.getOutputStream(), true);
+            outclient.println(clientid);
             while (true) {
                 //read requests from client
                 //System.out.println("Estou à espera do request");
@@ -60,6 +63,7 @@ public class RequestHandler extends Thread {
         if (index != -1) {
             monitor.increaseServerRequest(index);
             int serverport = monitor.getServerPort(index);
+            System.out.println(" 1 "+serverport);
             lbserversocket = new Socket("localhost", serverport);
 
             outserver = new PrintWriter(lbserversocket.getOutputStream(), true);

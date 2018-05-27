@@ -14,15 +14,16 @@ public class HeartBeatReceiverThread extends Thread {
     private PrintWriter out;
     private List<ServerInfo> activeservers;
     private ReentrantLock rl;
-    private int idserver;
+    private int serverid;
     private int size;
     private int portserver;
     private String hostserver = "localhost";
 
-    public HeartBeatReceiverThread(Socket hbsocket, List<ServerInfo> activeservers, ReentrantLock rl) {
+    public HeartBeatReceiverThread(Socket hbsocket, List<ServerInfo> activeservers, ReentrantLock rl,int serverid) {
         this.hbsocket = hbsocket;
         this.activeservers = activeservers;
         this.rl = rl;
+        this.serverid=serverid;
     }
 
     @Override
@@ -32,9 +33,9 @@ public class HeartBeatReceiverThread extends Thread {
             out = new PrintWriter(hbsocket.getOutputStream(), true);
             // socket's input stream
             in = new BufferedReader(new InputStreamReader(hbsocket.getInputStream()));
-
-            idserver = Integer.parseInt(in.readLine());
-            System.out.println("Chegou msg com id do servidor " + idserver);
+            out.println(serverid);
+            //idserver = Integer.parseInt(in.readLine());
+            System.out.println("Chegou msg do servidor com id atribuido: " + serverid);
 
             portserver = Integer.parseInt(in.readLine());
             size = Integer.parseInt(in.readLine());
@@ -43,14 +44,14 @@ public class HeartBeatReceiverThread extends Thread {
             try {
                 boolean flag = false;
                 for (int i = 0; i < activeservers.size(); i++) {
-                    if (activeservers.get(i).getId() == idserver) {
+                    if (activeservers.get(i).getId() == serverid) {
                         flag = true;
                         break;
                     }
                 }
                 if (!flag) {
-                    activeservers.add(new ServerInfo(idserver, portserver, hostserver, size));
-                    System.out.println("Servidor ligado do lb" + idserver);
+                    activeservers.add(new ServerInfo(serverid, portserver, hostserver, size));
+                    System.out.println("Servidor ligado do lb" + serverid);
                 }
             } catch (Exception e) {
 
@@ -62,14 +63,14 @@ public class HeartBeatReceiverThread extends Thread {
                 String text = in.readLine();
                 // null message? server down
                 if (text == null) {
-                    System.out.println("Servidor mensagem nula" + idserver);
+                    System.out.println("Servidor mensagem nula" + serverid);
                     // end of communication with this client
                     //j.append("Server " + id + " is down!\n");
                     rl.lock();
                     try {
                         int index = -1;
                         for (int i = 0; i < activeservers.size(); i++) {
-                            if (activeservers.get(i).getId() == idserver) {
+                            if (activeservers.get(i).getId() == serverid) {
                                 index = i;
                                 break;
                             }

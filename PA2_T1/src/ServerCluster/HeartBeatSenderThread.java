@@ -34,7 +34,9 @@ public class HeartBeatSenderThread extends Thread {
             //int id= Integer.parseInt(in.readLine());
             //server.setServerId(id); 
             //jTextArea1.append("id = " + id + "\n");
-            out.println(server.getServerId());
+            //setserverID
+            server.setServerId(Integer.parseInt(in.readLine()));
+            System.out.println("SERVER ID: "+server.getServerId());
             out.println(server.getPortToRequest());
             out.println(server.getQueueSize());
         } catch (UnknownHostException e) {

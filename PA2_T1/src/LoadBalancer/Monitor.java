@@ -10,18 +10,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Monitor {
 
     private ReentrantLock rl = new ReentrantLock();
+    private static int serverid=0;
     private int hbport;
     private ServerSocket monitorlisteningsocket;
     private Socket serverhbsocket;
     private List<ServerInfo> activeservers = new ArrayList<>();
-
-    public void rmServer(int id) {
-
-    }
-
-    public void addRequestToServer() {
-
-    }
 
     public void setHbport(int hbport) {
         this.hbport = hbport;
@@ -32,19 +25,11 @@ public class Monitor {
     }
     
     public void decreaseServerRequest(int index){
-        for(int i =0;i< activeservers.size();i++){
-            if(activeservers.get(i).getId()==index){
-                activeservers.get(i).decrementRequests();
-            }              
-        }
+        activeservers.get(index).decrementRequests();
     }
 
     public void increaseServerRequest(int index) {
-        for (int i = 0; i < activeservers.size(); i++) {
-            if (activeservers.get(i).getId() == index) {
-                activeservers.get(i).incrementRequests();
-            }
-        }
+        activeservers.get(index).incrementRequests();
     }
 
     public int getIndexOfMostFreeServer(){
@@ -54,8 +39,9 @@ public class Monitor {
         try {
             for(int i = 0;i< activeservers.size();i++){
                 if(activeservers.get(i).getActive_requests()/activeservers.get(i).getSize()<fator){
-                    fator = activeservers.get(i).getActive_requests()/activeservers.get(i).getSize();
+                    fator = (double)activeservers.get(i).getActive_requests()/(double)activeservers.get(i).getSize();
                     index=i;
+                    System.out.println("!!!!!!!!!!!getMostfreeserver index: "+index);
                 }
             }
         } finally {
@@ -90,8 +76,9 @@ public class Monitor {
                         //jTextArea2.append("Server Connected\n");
                     } catch (IOException ex) {
                     }                                       
-                    HeartBeatReceiverThread hb = new HeartBeatReceiverThread(serverhbsocket,activeservers,rl);
+                    HeartBeatReceiverThread hb = new HeartBeatReceiverThread(serverhbsocket,activeservers,rl,serverid);
                     hb.start();
+                    serverid++;
                 }
             }
         };

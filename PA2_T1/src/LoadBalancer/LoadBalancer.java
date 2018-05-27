@@ -13,6 +13,7 @@ public class LoadBalancer extends Thread {
     private ServerSocket lbsocket;
     private Socket clientsocket;
     private Monitor monitor;
+    private static int clientid=0;
 
     public LoadBalancer() {
         monitor = new Monitor();
@@ -35,7 +36,6 @@ public class LoadBalancer extends Thread {
         Thread receiverequests = new Thread() {
             public void run() {
                 while (true) {
-                    System.out.println("estou a aguardar connects");
                     try {
                         clientsocket = lbsocket.accept();
                     } catch (IOException ex) {
@@ -43,8 +43,9 @@ public class LoadBalancer extends Thread {
                     }
                     System.out.println("pedido recebido");
                     System.out.println(clientsocket.getPort());
-                    RequestHandler req = new RequestHandler(clientsocket, gui, monitor);
+                    RequestHandler req = new RequestHandler(clientsocket, gui, monitor,clientid);
                     req.start();
+                    clientid++;
                     System.out.println("pedido encaminhado");
 
                 }

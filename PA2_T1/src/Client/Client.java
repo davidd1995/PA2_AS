@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 
-    private static final AtomicInteger clientidcounter = new AtomicInteger(0); 
     private int clientid;
     private int requestid=1;
     private int precision;
@@ -23,13 +21,11 @@ public class Client {
     private ClientGUI gui;
 
     public Client() {
-        clientid=clientidcounter.incrementAndGet(); 
         gui = new ClientGUI(this);
         gui.setVisible(true);         
     }
     
     public void setConnection() throws IOException {
-        System.out.println("!!!!!!CC :: "+clientid);
         // open a connection with the lb
         // create a socket
         lbsocket = new Socket(lbip, lbport);
@@ -37,6 +33,8 @@ public class Client {
         out = new PrintWriter(lbsocket.getOutputStream(), true);
         // socket's input stream
         in = new BufferedReader(new InputStreamReader(lbsocket.getInputStream()));
+        //receive id from LB
+        this.clientid= Integer.parseInt(in.readLine());
         
         System.out.println("Connection is established with the Loadbalancer");
     }
