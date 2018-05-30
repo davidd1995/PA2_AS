@@ -82,7 +82,10 @@ public class RequestHandler extends Thread {
                 response = inserver.readLine();
                 //Server is down
                 if (response == null) {
+                    monitor.rl.lock();
+                    Thread.sleep(1000);
                     allocateRequest(request);
+                    monitor.rl.unlock();
                 } else {
                     display(response);
                     //return answer to client
@@ -90,6 +93,8 @@ public class RequestHandler extends Thread {
                 }
 
             } catch (IOException ex) {
+                Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
             outserver.close();

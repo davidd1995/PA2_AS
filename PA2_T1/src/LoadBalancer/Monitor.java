@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
 
-    private ReentrantLock rl = new ReentrantLock();
+    public ReentrantLock rl = new ReentrantLock();
     private static int serverid=0;
     private int hbport;
     private ServerSocket monitorlisteningsocket;

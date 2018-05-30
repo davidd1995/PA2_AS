@@ -75,6 +75,7 @@ public class HeartBeatReceiverThread extends Thread {
                                 break;
                             }
                         }
+                        System.out.println("SDFEATERGAERREG "+index);
                         if (index != -1) {
                             activeservers.remove(index);
                         }
