@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class LoadBalancer extends Thread {
 
     private int lbport;
-    private LoadBalancerAndMonitorGUI gui;
+    public static LoadBalancerAndMonitorGUI gui;
     private ServerSocket lbsocket;
     private Socket clientsocket;
     private Monitor monitor;

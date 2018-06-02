@@ -1,5 +1,6 @@
 package LoadBalancer;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -50,8 +51,9 @@ public class HeartBeatReceiverThread extends Thread {
                     }
                 }
                 if (!flag) {
+
                     activeservers.add(new ServerInfo(serverid, portserver, hostserver, size));
-                    System.out.println("Servidor ligado do lb" + serverid);
+                    display("O servidor com id "+serverid + " está ligado");
                 }
             } catch (Exception e) {
 
@@ -66,6 +68,7 @@ public class HeartBeatReceiverThread extends Thread {
                     System.out.println("Servidor mensagem nula" + serverid);
                     // end of communication with this client
                     //j.append("Server " + id + " is down!\n");
+                    display("O servidor com id "+serverid + " foi abaixo");
                     rl.lock();
                     try {
                         int index = -1;
@@ -91,5 +94,14 @@ public class HeartBeatReceiverThread extends Thread {
             }
         } catch (Exception e) {
         }
+    }
+    
+    private void display(String message) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                LoadBalancer.gui.appendEventsMonitor(message);
+            }
+        });
     }
 }

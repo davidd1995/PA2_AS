@@ -44,7 +44,7 @@ public class LoadBalancerAndMonitorGUI extends javax.swing.JFrame {
 
         jLabel2.setText("Listening port:");
 
-        jTextField1.setText("jTextField1");
+        jTextField1.setText("5000");
 
         jButton1.setText("Start");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -57,7 +57,12 @@ public class LoadBalancerAndMonitorGUI extends javax.swing.JFrame {
 
         jLabel4.setText("Heartbeat listening port:");
 
-        jTextField2.setText("jTextField2");
+        jTextField2.setText("5002");
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -134,11 +139,19 @@ public class LoadBalancerAndMonitorGUI extends javax.swing.JFrame {
             Logger.getLogger(LoadBalancerAndMonitorGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
     
     //CONCORRÊNCIA
     
     public void appendEvents(String event){
         this.jTextArea1.append(event+"\n");
+    }
+    
+    public void appendEventsMonitor(String event){
+        this.jTextArea2.append(event+"\n");
     }
     /**
      * @param args the command line arguments

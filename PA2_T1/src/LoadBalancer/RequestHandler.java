@@ -63,7 +63,7 @@ public class RequestHandler extends Thread {
         if (index != -1) {
             monitor.increaseServerRequest(index);
             int serverport = monitor.getServerPort(index);
-            System.out.println(" 1 "+serverport);
+            int serverid = monitor.getServerId(index);
             lbserversocket = new Socket("localhost", serverport);
 
             outserver = new PrintWriter(lbserversocket.getOutputStream(), true);
@@ -71,7 +71,9 @@ public class RequestHandler extends Thread {
 
             //depois de decidir o servidor, manda o id do servidor no pedido.
             //manda para a GUI o evento cliente- servidor- pedido
+            String[] parts = request.split("\\|");
             display(request);
+            display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" foi encaminhado p/servidor "+serverid);
 
             //send request to specific server
             outserver.println(request);
@@ -82,10 +84,14 @@ public class RequestHandler extends Thread {
                 response = inserver.readLine();
                 //Server is down
                 if (response == null) {
+                    display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" vai ser realocado");
                     monitor.rl.lock();
-                    Thread.sleep(1000);
-                    allocateRequest(request);
-                    monitor.rl.unlock();
+                    try {
+                        Thread.sleep(1000);
+                        allocateRequest(request);
+                    } finally {
+                        monitor.rl.unlock();
+                    }
                 } else {
                     display(response);
                     //return answer to client
@@ -104,6 +110,7 @@ public class RequestHandler extends Thread {
         } else {
             String[] parts = request.split("\\|");
             display(request);
+            display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" foi rejeitado");
             display("Result: |" + parts[1] + "|" + parts[2] + "|03|" + parts[4] + "|" + parts[5]);
             outclient.println("Result: |" + parts[1] + "|" + parts[2] + "|03|" + parts[4] + "|" + parts[5]);
         }

@@ -49,13 +49,13 @@ public class ServerGUI extends javax.swing.JFrame {
 
         jLabel3.setText("Monitor port HB:");
 
-        jTextField1.setText("jTextField1");
+        jTextField1.setText("4000");
 
-        jTextField2.setText("jTextField2");
+        jTextField2.setText("5002");
 
         jLabel4.setText("Queue size:");
 
-        jTextField3.setText("jTextField3");
+        jTextField3.setText("3");
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -95,7 +95,7 @@ public class ServerGUI extends javax.swing.JFrame {
                                 .addComponent(jLabel3)
                                 .addGap(3, 3, 3)
                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 12, Short.MAX_VALUE))
+                        .addGap(0, 113, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

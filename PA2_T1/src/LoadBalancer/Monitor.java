@@ -34,8 +34,8 @@ public class Monitor {
 
     public int getIndexOfMostFreeServer(){
         int index=0;
-        double fator=1;
         rl.lock();
+        double fator=1;
         try {
             for(int i = 0;i< activeservers.size();i++){
                 if(activeservers.get(i).getActive_requests()/activeservers.get(i).getSize()<fator){
@@ -56,6 +56,10 @@ public class Monitor {
     public int getServerPort(int index){
         return activeservers.get(index).getPort();
     }
+    
+    public int getServerId(int index) {
+        return activeservers.get(index).getId();
+    }
 
     //lança a thread para escutar ligações ao monitor e outra para escutar os heartbeats de cada servidor
     public void listenHeartBeats() {
@@ -65,15 +69,11 @@ public class Monitor {
                 try {
                     monitorlisteningsocket = new ServerSocket(hbport);
                 } catch (Exception e) {
-                    //jTextArea2.append(e.getMessage() + "\n");
                 }
-                //jTextArea2.append("Heartbeat is listening on port: " + Integer.parseInt(jTextField2.getText()) + "\n");
                 while (true) {
-                    //jTextArea2.append("Heartbeat is waiting for a new connection\n");
                     // wait for a new connection/client
                     try {
                         serverhbsocket = monitorlisteningsocket.accept();
-                        //jTextArea2.append("Server Connected\n");
                     } catch (IOException ex) {
                     }                                       
                     HeartBeatReceiverThread hb = new HeartBeatReceiverThread(serverhbsocket,activeservers,rl,serverid);
