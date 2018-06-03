@@ -90,7 +90,7 @@ public class HeartBeatReceiverThread extends Thread {
                     return;
                 }
                 //j.append("Server " + id + " is " + text + "\n");
-                System.out.println(activeservers.toString());
+                System.out.println("!!"+activeservers.toString());
             }
         } catch (Exception e) {
         }

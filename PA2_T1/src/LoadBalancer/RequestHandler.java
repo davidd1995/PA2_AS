@@ -110,6 +110,7 @@ public class RequestHandler extends Thread {
             Thread.sleep(1000);
             monitor.decreaseServerRequest(index);
         } else {
+            monitor.rl.unlock();
             String[] parts = request.split("\\|");
             display(request);
             display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" foi rejeitado");
