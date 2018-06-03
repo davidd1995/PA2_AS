@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Monitor {
 
     public ReentrantLock rl = new ReentrantLock();
-    private static int serverid=0;
+    private static int serverid = 0;
     private int hbport;
     private ServerSocket monitorlisteningsocket;
     private Socket serverhbsocket;
@@ -23,8 +23,8 @@ public class Monitor {
     public ReentrantLock getRl() {
         return rl;
     }
-    
-    public void decreaseServerRequest(int index){
+
+    public void decreaseServerRequest(int index) {
         activeservers.get(index).decrementRequests();
     }
 
@@ -32,31 +32,29 @@ public class Monitor {
         activeservers.get(index).incrementRequests();
     }
 
-    public int getIndexOfMostFreeServer(){
-        int index=0;
-        rl.lock();
-        double fator=1;
-        try {
-            for(int i = 0;i< activeservers.size();i++){
-                if(activeservers.get(i).getActive_requests()/activeservers.get(i).getSize()<fator){
-                    fator = (double)activeservers.get(i).getActive_requests()/(double)activeservers.get(i).getSize();
-                    index=i;
-                    System.out.println("!!!!!!!!!!!getMostfreeserver index: "+index);
-                }
+    public int getIndexOfMostFreeServer() {
+        int index = 0;
+        double fator = 1;
+        for (int i = 0; i < activeservers.size(); i++) {
+            if ((double)activeservers.get(i).getActive_requests() / (double)activeservers.get(i).getSize() < fator) {
+                fator = (double) activeservers.get(i).getActive_requests() / (double) activeservers.get(i).getSize();
+                index = i;
+                
             }
-        } finally {
-            rl.unlock();
+            System.out.println("Monitor TODOS-> index: " + i+ " fator "+fator);
         }
-        if(fator ==1){
+
+        if (fator == 1) {
             return -1;
         }
+        System.out.println("Monitor TODOS-> index escolhido: " + index+ " fator "+fator);
         return index;
     }
-    
-    public int getServerPort(int index){
+
+    public int getServerPort(int index) {
         return activeservers.get(index).getPort();
     }
-    
+
     public int getServerId(int index) {
         return activeservers.get(index).getId();
     }
@@ -75,8 +73,8 @@ public class Monitor {
                     try {
                         serverhbsocket = monitorlisteningsocket.accept();
                     } catch (IOException ex) {
-                    }                                       
-                    HeartBeatReceiverThread hb = new HeartBeatReceiverThread(serverhbsocket,activeservers,rl,serverid);
+                    }
+                    HeartBeatReceiverThread hb = new HeartBeatReceiverThread(serverhbsocket, activeservers, rl, serverid);
                     hb.start();
                     serverid++;
                 }

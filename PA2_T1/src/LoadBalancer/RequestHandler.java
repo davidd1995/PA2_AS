@@ -52,16 +52,21 @@ public class RequestHandler extends Thread {
             inclient.close();
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void allocateRequest(String request) throws IOException {
-
+    private void allocateRequest(String request) throws IOException, InterruptedException {
         /*Check servers load*/
+
+        monitor.rl.lock();
         int index = monitor.getIndexOfMostFreeServer();
+
         System.out.println("indice do servidor free: " + index);
         if (index != -1) {
             monitor.increaseServerRequest(index);
+            monitor.rl.unlock();
             int serverport = monitor.getServerPort(index);
             int serverid = monitor.getServerId(index);
             lbserversocket = new Socket("localhost", serverport);
@@ -85,13 +90,9 @@ public class RequestHandler extends Thread {
                 //Server is down
                 if (response == null) {
                     display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" vai ser realocado");
-                    monitor.rl.lock();
-                    try {
-                        Thread.sleep(1000);
-                        allocateRequest(request);
-                    } finally {
-                        monitor.rl.unlock();
-                    }
+                    Thread.sleep(1000);
+                    allocateRequest(request);
+
                 } else {
                     display(response);
                     //return answer to client
@@ -106,6 +107,7 @@ public class RequestHandler extends Thread {
             outserver.close();
             inserver.close();
             lbserversocket.close();
+            Thread.sleep(1000);
             monitor.decreaseServerRequest(index);
         } else {
             String[] parts = request.split("\\|");
