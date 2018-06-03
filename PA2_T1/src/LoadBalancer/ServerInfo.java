@@ -63,6 +63,7 @@ public class ServerInfo {
     }
 
     public synchronized void decrementRequests() {
+        System.out.println("decrementei!!!! no server id "+this.getId());
         this.active_requests--;
     }
 

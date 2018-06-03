@@ -91,8 +91,9 @@ public class RequestHandler extends Thread {
                 //Server is down
                 if (response == null) {
                     display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" vai ser realocado");
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                     allocateRequest(request);
+                    return ;
 
                 } else {
                     display(response);
@@ -108,7 +109,8 @@ public class RequestHandler extends Thread {
             outserver.close();
             inserver.close();
             lbserversocket.close();
-            Thread.sleep(1000);
+            Thread.sleep(2000);
+            System.out.println("antes do decrease "+index);
             monitor.decreaseServerRequest(index);
         } else {
             monitor.rl.unlock();
