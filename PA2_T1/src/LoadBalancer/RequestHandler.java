@@ -78,7 +78,8 @@ public class RequestHandler extends Thread {
             //manda para a GUI o evento cliente- servidor- pedido
             String[] parts = request.split("\\|");
             display(request);
-            display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" foi encaminhado p/servidor "+serverid);
+            int threadid = monitor.getServerThread(index);
+            display("O pedido nº "+parts[2]+ " do cliente "+parts[1]+" foi encaminhado p/servidor "+serverid+"na thread "+threadid);
 
             //send request to specific server
             outserver.println(request);

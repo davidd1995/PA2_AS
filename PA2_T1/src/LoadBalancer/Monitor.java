@@ -58,6 +58,10 @@ public class Monitor {
     public int getServerId(int index) {
         return activeservers.get(index).getId();
     }
+    
+    public int getServerThread(int index) {
+        return activeservers.get(index).getActive_requests();
+    }
 
     //lança a thread para escutar ligações ao monitor e outra para escutar os heartbeats de cada servidor
     public void listenHeartBeats() {
